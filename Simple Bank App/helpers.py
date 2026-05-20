@@ -1,6 +1,6 @@
 import streamlit as st 
 import pandas as pd
-import regex as re
+import re
 from datetime import date, datetime
 
 
