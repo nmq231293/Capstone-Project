@@ -17,7 +17,7 @@ def calculate_age(birth_date):
     age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
     return age
 
-df = pd.read_csv('_/Simple Bank App/bank_account.csv', dtype={'ID':str,'Phone':str}) #, index_col='ID')
+df = pd.read_csv('/Simple Bank App/bank_account.csv', dtype={'ID':str,'Phone':str}) #, index_col='ID')
 
 def signup(df, ten, ngay_sinh, email, sdt, matkhau, sodu):
     new_acc = pd.DataFrame({'ID':[f'{(len(df)+1):08}'], 'Name':[ten], 'DoB':[ngay_sinh], 'Email':[email], 'Phone':[sdt], 'Password':[matkhau], 'Balance':[sodu]})
