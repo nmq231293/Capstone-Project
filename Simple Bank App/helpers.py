@@ -20,7 +20,7 @@ def calculate_age(birth_date):
 df = pd.read_csv('Simple Bank App/bank_account.csv', dtype={'ID':str,'Phone':str}) #, index_col='ID')
 
 def signup(df, ten, ngay_sinh, email, sdt, matkhau, sodu):
-    new_acc = pd.DataFrame({'ID':[f'{(len(df)+1):08}'], 'Name':[ten], 'DoB':[ngay_sinh], 'Email':[email], 'Phone':[sdt], 'Password':[matkhau], 'Balance':[sodu]})
+    new_acc = pd.DataFrame({'ID':[f'{(len(df)+1):08}'], 'Name':[ten], 'DoB':[ngay_sinh], 'Phone':[sdt], 'Email':[email], 'Password':[matkhau], 'Balance':[sodu]})
     df = pd.concat([df,new_acc], ignore_index=True)
     df.to_csv('bank_account.csv', index=False)
 
@@ -29,8 +29,8 @@ def signup_form():
     with st.form('form_dang_ky',clear_on_submit=False):
         ten = st.text_input('Vui lòng nhập tên của bạn', value='Nguyễn Văn A', placeholder='Không được để trống')
         ngay_sinh = st.date_input('Chọn ngày sinh: ', value= datetime.today(), min_value= date(1920,1,1), max_value= datetime.today())
-        email = st.text_input('Nhập email của bạn: ')
         sdt = st.text_input('Nhập SĐT của bạn')
+        email = st.text_input('Nhập email của bạn: ')
         mat_khau = st.text_input('Vui lòng nhập mật khẩu', type='password', max_chars=24, placeholder='Không được để trống')
         sodu = st.number_input('Nhập số tiền khi tạo tài khoản', value= 2000000, min_value=500000, max_value=100000000000, step=100000, placeholder='Không được để trống', format= '%d')
         if st.form_submit_button('Đăng ký'):
@@ -44,11 +44,17 @@ def signup_form():
             if calculate_age(ngay_sinh) < 16:
                 st.error('Bạn phải trên 16 tuổi mới được tạo tài khoản')
                 form_check = False
+            if not validate_phone(sdt):
+                st.error('Số điện thoại phải bắt đầu là 0 hoặc 84 và kèm theo 9-10 chữ số')
+                form_check = False
+            elif  sdt in df['Phone']:
+                st.error('Số điện thoại đã được đăng ký, vui lòng chọn số khác')
+                form_check = False
             if not validate_email(email):
                 st.error('Email sai cú pháp')
                 form_check = False
-            if not validate_phone(sdt):
-                st.error('Số điện thoại phải bắt đầu là 0 hoặc 84 và kèm theo 9-10 chữ số')
+            elif email in df['Email']:
+                st.error('Email này đã được đăng ký, vui lòng chọn email khác')
                 form_check = False
             if mat_khau == '':
                 st.error('Mật khẩu không được để trống')
