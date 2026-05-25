@@ -24,6 +24,12 @@ pg = st.navigation([home, signup, signup_success, login, login_success, transfer
 
 if 'dem_sai_mk' not in st.session_state:
     st.session_state.dem_sai_mk = 0
+if 'acc_num' not in st.session_state:
+    st.session_state.acc_num = ''
+if 'acc_name' not in st.session_state:
+    st.session_state.acc_name = ''
+if 'signup_state' not in st.session_state:
+    st.session_state.signup_state = False
 if 'login_state' not in st.session_state:
     st.session_state.login_state = False
 if 'login_noti' not in st.session_state:
@@ -36,8 +42,6 @@ if 'receiver_num' not in st.session_state:
     st.session_state.receiver_num = ''
 if 'transfer_amount' not in st.session_state:
     st.session_state.transfer_amount = 0
-if 'acc_name' not in st.session_state:
-    st.session_state.acc_name = ''
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
