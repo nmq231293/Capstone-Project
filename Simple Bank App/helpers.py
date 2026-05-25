@@ -19,10 +19,11 @@ def calculate_age(birth_date):
 
 df = pd.read_csv('Simple Bank App/bank_account.csv', dtype={'ID':str,'Phone':str}) #, index_col='ID')
 
-def signup(df, ten, ngay_sinh, email, sdt, matkhau, sodu):
+def signup(ten, ngay_sinh, email, sdt, matkhau, sodu):
+    global df
     new_acc = pd.DataFrame({'ID':[f'{(len(df)+1):08}'], 'Name':[ten], 'DoB':[ngay_sinh], 'Phone':[sdt], 'Email':[email], 'Password':[matkhau], 'Balance':[sodu]})
     df = pd.concat([df,new_acc], ignore_index=True)
-    df.to_csv('bank_account.csv', index=False)
+    df.to_csv('Simple Bank App/bank_account.csv', index=False)
 
 
 def signup_form():
@@ -64,8 +65,9 @@ def signup_form():
                 form_check = False
             if form_check:
                 st.session_state.previous_page.append(st.session_state.current_page)
-                signup(df, ten, ngay_sinh, email, sdt, mat_khau, sodu)
-                st.session_state.acc_num = f'{(len(df)+1):08}'
+                signup(ten, ngay_sinh, email, sdt, mat_khau, sodu)
+                st.session_state.acc_num = f'{(len(df)):08}'
+                st.session_state.signup_state = True
                 st.switch_page('pages/signup_success.py')
             else:
                 st.error('Vui lòng kiểm tra và nhập lại')
@@ -81,7 +83,7 @@ def login_check(stk:str, mat_khau:str):
 
 def login_form():
     with st.form('form_dang_nhap', clear_on_submit=False):
-        stk = st.text_input('Số tài khoản', value='', max_chars=8, placeholder='Nhập số tài khoản của quý khách')        
+        stk = st.text_input('Số tài khoản', value=st.session_state.acc_num, max_chars=8, placeholder='Nhập số tài khoản của quý khách')        
         mat_khau = st.text_input('Mật khẩu', type='password', max_chars=24, placeholder='Nhập mật khẩu đăng nhập')
         if st.form_submit_button('Đăng nhập'):
             if stk == '':
