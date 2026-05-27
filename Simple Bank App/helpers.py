@@ -9,8 +9,17 @@ account_file = 'Simple Bank App/bank_account.csv'
 if os.path.exists(account_file):
     df = pd.read_csv(account_file, dtype={'ID':str,'Phone':str,'Balance':int}, index_col='ID')
 else:
-    df = pd.DataFrame({'ID':[], 'Name':[], 'DoB':[], 'Phone':[], 'Email':[], 'Password':[], 'Balance':[]}, dtype={'ID':str, 'Name':str, 'DoB':date, 'Phone':str, 'Email':str, 'Password':str, 'Balance':int}, index='ID')
-
+    df = pd.DataFrame(columns= ['ID', 'Name', 'DoB', 'Phone', 'Email', 'Password', 'Balance'])
+    df = df.astype({
+        'ID':'string',
+        'Name':'string',
+        'DoB':'string',
+        'Phone':'string',
+        'Email':'string',
+        'Password':'string',
+        'Balance':'int64'
+        })
+    df.set_index('ID')
 
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
