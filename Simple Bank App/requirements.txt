@@ -4,4 +4,3 @@ os
 re
 random
 datetime
-streamlit-smart-text-input
