@@ -138,9 +138,10 @@ def signup_form():
                                 ,placeholder=stk_mac_dinh, max_chars=8
                                 )
         else:
-            stk = st.selectbox('Chọn một số tài khoản hoặc chọn mặc định nếu quý khách muốn nhận số tài khoản ngẫu nhiên hoặc đổi dãy số khác'
-                                , ['Mặc định', 'Đổi dãy số khác'] + st.session_state.available_id_list, accept_new_options=True, placeholder='Mặc định'
+            stk = st.pills('Dưới đây là một vài số tài khoản có chứa dãy số yêu thích của quý khách, vui lòng chọn một số để làm số tài khoản'
+                                , ['Mặc định', 'Đổi dãy số khác'] + st.session_state.available_id_list, default='Mặc định'#, accept_new_options=True, placeholder='Mặc định'
                                 )
+            stk_modify = st.radio('Chọn stk theo', ['Mặc định', 'Đổi dãy số khác'], index=None, label_visibility=False)
             st.info('Quý khách hãy chọn một số tài khoản trong danh sách gợi ý')
         if st.form_submit_button('Đăng ký'):
             form_check = True
@@ -187,7 +188,7 @@ def signup_form():
                 if stk == 'Đổi dãy số khác':                    
                     st.rerun()
                 elif not id_available_check(stkc) or len(stk) < 8:
-                    st.session_state.available_id_list = new_id_suggest(int(stk),20)
+                    st.session_state.available_id_list = new_id_suggest(int(stk),28)
                     if st.session_state.available_id_list == []:
                         st.error('Không còn số tài khoản nào chứa dãy số này, hãy chọn số khác hoặc bỏ trống')
                         form_check = False
