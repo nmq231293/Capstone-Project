@@ -1,7 +1,7 @@
+pip install --upgrade pip
 streamlit
 pandas
 os
 re
 random
 datetime
-pip install --upgrade pip
