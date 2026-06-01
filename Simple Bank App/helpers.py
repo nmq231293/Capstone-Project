@@ -138,10 +138,10 @@ def signup_form():
                                 ,placeholder=stk_mac_dinh, max_chars=8
                                 )
         else:
-            stk = st.pills('Dưới đây là một vài số tài khoản có chứa dãy số yêu thích của quý khách, vui lòng chọn một số để làm số tài khoản'
-                                , ['Mặc định', 'Đổi dãy số khác'] + st.session_state.available_id_list, default='Mặc định'#, accept_new_options=True, placeholder='Mặc định'
-                                )
-            stk_modify = st.radio('Chọn stk theo', ['Mặc định', 'Đổi dãy số khác'], index=None, label_visibility=False)
+            stk = st.pills('Dưới đây là một vài số tài khoản có chứa dãy số yêu thích của quý khách, vui lòng chọn một số để làm số tài khoản. Quý khách có thể chọn Mặc định để nhận số tài khoản ngẫu nhiên hoặc Đổi dãy số khác'
+                                , st.session_state.available_id_list,
+                            )
+            stk_modify = st.radio('Chọn stk theo', ['Mặc định', 'Đổi dãy số khác'], index=None, label_visibility='hidden')
             st.info('Quý khách hãy chọn một số tài khoản trong danh sách gợi ý')
         if st.form_submit_button('Đăng ký'):
             form_check = True
@@ -172,7 +172,12 @@ def signup_form():
             elif len(mat_khau) < 8:
                 st.error('Mật khẩu phải chứa từ 8-24 ký tự')
                 form_check = False
-            if stk == '' or stk == 'Mặc định':
+            if st.session_state.available_id_list != [] and stk_modify != None:
+                stk = stk_modify
+            if stk == None:
+                st.error('Bạn phải chọn một dãy số làm số tài khoản. Nếu không hãy chọn Mặc định hoặc Đổi dãy số khác')
+                form_check = False
+            elif stk == '' or stk == 'Mặc định':
                 stk = stk_mac_dinh
             elif stk == 'Đổi dãy số khác':
                 st.session_state.available_id_list = []
