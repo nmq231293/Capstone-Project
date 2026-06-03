@@ -6,7 +6,7 @@ if st.session_state.login_state == False:
 
 
 st.header('**:red[KIỂM TRA THÔNG TIN CHUYỂN KHOẢN]**', width='stretch',text_alignment='center')
-st.session_state.current_page = 'pages/transfer_rehearsal.py'
+# st.session_state.current_page = 'pages/transfer_rehearsal.py'
 
 if st.session_state.transfer_state == 0:
     st.switch_page('pages/re_submit.py')

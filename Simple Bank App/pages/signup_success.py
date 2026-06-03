@@ -3,7 +3,7 @@ import streamlit as st
 if st.session_state.login_state == True or st.session_state.signup_state == False:
     st.switch_page('pages/re_submit.py')
 st.header('**:red[ĐĂNG KÝ THÀNH CÔNG]**', width='stretch',text_alignment='center')
-st.session_state.current_page = 'pages/signup_success.py'
+# st.session_state.current_page = 'pages/signup_success.py'
 
 st.balloons()
 col1, col2, col3 = st.columns(3)

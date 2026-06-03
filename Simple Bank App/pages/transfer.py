@@ -5,7 +5,7 @@ if st.session_state.login_state == False:
     st.switch_page('pages/home.py')
 
 st.header('**:red[CHUYỂN KHOẢN]**', width='stretch',text_alignment='left')
-st.session_state.current_page = 'pages/transfer.py'
+# st.session_state.current_page = 'pages/transfer.py'
 
 if st.session_state.login_state == True:
     st.write(f'Số dư khả dụng: {format(available_balance(st.session_state.acc_num), ',')} VNĐ')
