@@ -66,7 +66,7 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     if st.session_state.previous_page != []:
         if st.button('Quay lại trang trước', icon='🔙'):
-            switch_page_check(st.session_state.previous_page.pop(-1), False)
+            switch_page_check(st.session_state.previous_page[-1], False)
 
 with col4:
     if st.button('Trang chủ', icon='🏡'):

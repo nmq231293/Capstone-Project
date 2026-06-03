@@ -41,7 +41,9 @@ def switch_page_confirm(page_path, page_trace = True):
     if st.button('**:red[Rời khỏi trang này]**'):
         if page_trace:
             st.session_state.previous_page.append(st.session_state.current_page)
-        st.switch_page(page_path)
+            st.switch_page(page_path)
+        else:
+            st.switch_page(st.session_state.previous_page.pop(-1))
     if st.button('**:green[Ở lại trang này]**'):
         st.rerun()
 
