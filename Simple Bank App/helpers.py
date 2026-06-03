@@ -48,7 +48,7 @@ def switch_page_confirm(page_path, page_trace = True):
 
 def switch_page_check(page_path, page_trace = True):
     check = True
-    for i in ['login.py','signup.py','transfer.py']:
+    for i in ['login.py','signup.py','transfer.py','transfer_rehearsal.py']:
         if i in str(st.session_state.current_page):
             check = False
             switch_page_confirm(page_path, page_trace)

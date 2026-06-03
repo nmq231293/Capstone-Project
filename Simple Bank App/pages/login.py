@@ -1,5 +1,5 @@
 import streamlit as st
-from helpers import login_form
+from helpers import login_form, switch_page_confirm
 
 if st.session_state.login_state == True:
     st.switch_page('pages/re_submit.py')
@@ -9,5 +9,4 @@ st.header('**:red[ĐĂNG NHẬP]**', width='stretch',text_alignment='left')
 
 login_form()
 if st.button('Quay về trang chủ', icon='🏡'):
-    st.session_state.previous_page.append(st.session_state.current_page)
-    st.switch_page('pages/home.py')
+    switch_page_confirm('pages/home.py')

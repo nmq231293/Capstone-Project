@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from helpers import signup_form, switch_page_check
+from helpers import signup_form, switch_page_confirm
 
 
 if st.session_state.login_state == True:
@@ -12,4 +12,4 @@ st.header('**:red[ĐĂNG KÝ]**', width='stretch',text_alignment='left')
 signup_form()
 
 if st.button('Quay về trang chủ', icon='🏡'):
-    switch_page_check('pages/home.py')
+    switch_page_confirm('pages/home.py')
