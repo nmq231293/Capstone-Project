@@ -197,6 +197,7 @@ def account_signup(stk, ten, ngay_sinh, sdt, email, matkhau, sodu):
                             'Balance':sodu
                             })
     df.sort_index(inplace=True)
+    # df.to_csv(account_file)
     work_sheet_update()
 
 def process_temp_DoB():
