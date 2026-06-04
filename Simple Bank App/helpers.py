@@ -86,9 +86,9 @@ def new_id_check(id):
 def id_available_check(num):
     return True if num not in df.index else False
 
-def id_num_generate(init_num:int, init_choices = [6,8,9]):
-    init_str = str(init_num)
-    init_len = len(init_str)
+def id_num_generate(init_num:str, init_choices = [6,8,9]):
+    
+    init_len = len(init_num)
     spaces_count = 8 - init_len
     choices = [str(x) for x in init_choices]
     
@@ -109,15 +109,15 @@ def id_num_generate(init_num:int, init_choices = [6,8,9]):
 
             temp = filler.copy()
 
-            temp.insert(i, init_str)
+            temp.insert(i, init_num)
 
             whole_num = "".join(temp)
             kq.add(whole_num)
             
     return sorted(list(kq))
 
-def new_id_suggest(init_id:int, suggest_num:int):
-    if len(str(init_id)) > 4:
+def new_id_suggest(init_id:str, suggest_num:int):
+    if len(init_id) > 4:
         good_id = id_num_generate(init_id,[0,1,2,3,4,5,6,7,8,9])
     else:
         good_id = id_num_generate(init_id)
@@ -231,7 +231,7 @@ def signup_form():
             if stk == 'Đổi dãy số khác':           
                 st.rerun()
             if not id_available_check(stkc) or len(stk) < 8:
-                st.session_state.available_id_list = new_id_suggest(int(stk),28)
+                st.session_state.available_id_list = new_id_suggest(stk,28)
                 if st.session_state.available_id_list == []:
                     st.error('Không còn số tài khoản khả dụng nào chứa dãy số này, hãy chọn số khác hoặc bỏ trống')
                     form_check = False
