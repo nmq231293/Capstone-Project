@@ -1,12 +1,12 @@
 [theme]
-# 1. Giữ nguyên màu nền chính (Tím than tối)
+# Màu nền chính
 backgroundColor = "#170352"
 
-# 2. Thay đổi màu xanh của Sidebar thành màu xanh dương nhạt dịu mắt hơn
+# Màu của widget
 secondaryBackgroundColor = "#014589"
 
-# 3. ĐỔI NỀN NÚT BẤM: Chuyển sang màu xanh dương nhạt theo ý bạn
+# Màu nút bấm
 primaryColor = "#b80b02"
 
-# 4. CHỮ TRONG KHUNG NHẬP LIỆU: Đổi sang màu vàng tươi tuyệt đối
+# Màu chữ các khung nhập liệu
 textColor = "#ffff00"

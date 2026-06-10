@@ -82,17 +82,20 @@ with col1:
         if st.button('Quay lại trang trước', icon='🔙'):
             switch_page_check(st.session_state.previous_page[-1], False)
 
+setting_options = ['🙎🏻‍♂️ :green[Tài khoản]', '🔑 :red[Đăng xuất]']
+if st.session_state.power_level > 0:
+    setting_options.insert(0, '👑 :violet[Công cụ quản trị trang]')
+
 with col4:
     if st.session_state.login_state:
-        with st.popover('Cài đặt', icon='⚙️',type='secondary',use_container_width=False,width='content'):
-            if st.session_state.power_level > 0:
-                if st.button('**:violet[Công cụ Quản trị trang]**', icon='👑'):
-                    st.session_state.previous_page.append(st.session_state.current_page)
-                    st.switch_page('pages/admin_power.py')
-            if st.button('**:green[Tài khoản]**', icon='🙎🏻‍♂️'):
+        if settings_menu := st.menu_button('Cài đặt', setting_options, icon='⚙️', type='secondary', width='content'):
+            if settings_menu == '👑 :violet[Công cụ quản trị trang]':
+                st.session_state.previous_page.append(st.session_state.current_page)
+                st.switch_page('pages/admin_power.py')
+            elif settings_menu == '🙎🏻‍♂️ :green[Tài khoản]':
                 st.session_state.previous_page.append(st.session_state.current_page)
                 st.switch_page('pages/account_settings.py')
-            if st.button('**:red[Đăng xuất]**', icon='🔑'):
+            elif settings_menu == '🔑 :red[Đăng xuất]':
                 st.session_state.login_state = False
                 st.session_state.login_noti = False
                 st.session_state.acc_num = ''
@@ -107,6 +110,30 @@ with col4:
                 st.session_state.logout_state = True
                 if st.session_state.current_page != 'pages/home.py':
                     st.session_state.previous_page.append(st.session_state.current_page)
-                st.switch_page('pages/home.py')
+                    st.switch_page('pages/home.py')
+        # with st.popover('Cài đặt', icon='⚙️',type='secondary',use_container_width=False,width='content'):
+        #     if st.session_state.power_level > 0:
+        #         if st.button('**:violet[Công cụ quản trị trang]**', icon='👑'):
+        #             st.session_state.previous_page.append(st.session_state.current_page)
+        #             st.switch_page('pages/admin_power.py')
+        #     if st.button('**:green[Tài khoản]**', icon='🙎🏻‍♂️'):
+        #         st.session_state.previous_page.append(st.session_state.current_page)
+        #         st.switch_page('pages/account_settings.py')
+        #     if st.button('**:red[Đăng xuất]**', icon='🔑'):
+        #         st.session_state.login_state = False
+        #         st.session_state.login_noti = False
+        #         st.session_state.acc_num = ''
+        #         st.session_state.acc_name = ''
+        #         st.session_state.power_level = 0
+        #         st.session_state.receiver_num = ''
+        #         st.session_state.transfer_amount = 0
+        #         st.session_state.dem_sai_mk = 0
+        #         st.session_state.transfer_state = 0
+        #         st.session_state.signup_state = False
+        #         st.session_state.available_id_list = []
+        #         st.session_state.logout_state = True
+        #         if st.session_state.current_page != 'pages/home.py':
+        #             st.session_state.previous_page.append(st.session_state.current_page)
+        #             st.switch_page('pages/home.py')
 
 pg.run()
