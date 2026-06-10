@@ -1,8 +1,10 @@
 import streamlit as st
 import time
 
-st.header('**:red[NHẬP SAI MẬT KHẨU QUÁ 3 LẦN, QUÝ KHÁCH SẼ ĐƯỢC ĐƯA VỀ TRANG CHỦ SAU 5 GIÂY]**', width='stretch',text_alignment='center')
+text = st.session_state.text
 
-with st.spinner('Đang điều hướng về trang chủ ...'):
+st.header(f'**:red[{text["password_wrong_header"].upper()}]**', width='stretch',text_alignment='center')
+
+with st.spinner(f'{text["redirecting_message"]}'):
     time.sleep(5)
     st.switch_page('pages/home.py')

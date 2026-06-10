@@ -1,45 +1,46 @@
 import streamlit as st
 from helpers import available_balance
 
-st.header('**:red[TRANG CHỦ]**', width='stretch',text_alignment='left')
-# st.session_state.current_page = 'pages/home.py'
+text = st.session_state.text
+
+st.header(f'**:red[{text["home_title"].upper()}]**', width='stretch',text_alignment='left')
 
 st.session_state.available_id_list = []
 
 if not st.session_state.login_state:
     if st.session_state.logout_state:
-        st.error('Đã đăng xuất')
+        st.error(f'{text["logged_out_noti"]}')
         st.session_state.logout_state = False
     col1, col2 = st.columns(2)
     with col1:
-        if st.button('Đăng nhập', icon='🔑'):
+        if st.button(f'{text["login_title"]}', icon='🔑'):
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/login.py')
 
     with col2:
-        if st.button('Đăng ký', icon='🔐'):
+        if st.button(f'{text["signup_title"]}', icon='🔐'):
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/signup.py')
 
 else:
     if st.session_state.login_noti:
-        st.success('Đăng nhập thành công')
+        st.success(f'{text["logged_in_noti"]}')
         st.session_state.login_noti = False
-    st.markdown(f'Xin chào **:green[{st.session_state.acc_name}]**')
-    st.write(f'Số dư khả dụng: **:green[{format(available_balance(st.session_state.acc_num), ',')} VNĐ]**')
+    st.markdown(f'{text["greetings"]}: **:green[{st.session_state.acc_name}]**')
+    st.write(f'{text["available_balance"]}: **:green[{format(available_balance(st.session_state.acc_num), ",")} VNĐ]**')
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button('Chuyển khoản', icon='💸'):
+        if st.button(f'{text["transfer_title"]}', icon='💸'):
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/transfer.py')
 
     with col2:                
-        if st.button('Nạp tiền', icon='💵'):
+        if st.button(f'{text["deposit_title"]}', icon='💵'):
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/deposit.py')
 
     with col3:
-        if st.button('Rút tiền', icon='💰'):
+        if st.button(f'{text["withdraw_title"]}', icon='💰'):
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/withdraw.py')

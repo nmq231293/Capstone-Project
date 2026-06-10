@@ -20,21 +20,18 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
+# Chương trình chatbot trợ lý ảo:
 def embed_chatbot():
     
-    system_instruction = {
-        "role": "system", 
-        "content": "Bạn là trợ lý ảo hỗ trợ web ứng dụng Ngân hàng Kachàpú. Github của web app này là https://github.com/nmq231293/Capstone-Project. App được deploy bằng Streamlit. Hãy hướng dẫn người dùng đăng ký, đăng nhập, gửi tiền, rút tiền một cách cực kỳ ngắn gọn, lịch sự bằng tiếng Việt."
-    }
-
     SYSTEM_PROMPT = """
-    Bạn là một trợ lý ảo thông minh được tích hợp trong ứng dụng "Simple Bank App".
+    Bạn là một trợ lý ảo thông minh được tích hợp trong ứng dụng "NGÂN HÀNG REYNOLD".
     Nhiệm vụ của bạn là hỗ trợ, giải đáp và hướng dẫn người dùng cách sử dụng các tính năng của app.
 
     Thông tin về ứng dụng gồm các tính năng chính sau:
     1. Đăng nhập / Đăng ký tài khoản hệ thống.
     2. Xem số dư tài khoản trực tuyến.
-    3. Gửi tiền (Deposit) và Rút tiền (Withdraw).
+    3. Gửi tiền (Deposit), Rút tiền (Withdraw).
     4. Chuyển khoản nội bộ hoặc liên ngân hàng bảo mật.
     5. Xem lịch sử giao dịch gần đây.
 
@@ -42,7 +39,13 @@ def embed_chatbot():
     - Luôn trả lời bằng tiếng Việt, lịch sự, ngắn gọn và dễ hiểu.
     - Chỉ tập trung trả lời các câu hỏi liên quan đến dịch vụ ngân hàng hoặc cách thao tác trên ứng dụng này.
     - Nếu người dùng hỏi các vấn đề ngoài phạm vi ứng dụng, hãy khéo léo từ chối và hướng họ quay lại chủ đề chính.
-    """
+    """    
+    system_instruction = {
+        "role": "system", 
+        "content": SYSTEM_PROMPT
+    }
+
+
 
     if "messages" not in st.session_state:
         st.session_state.messages = [system_instruction]
@@ -494,7 +497,7 @@ def login_form():
                     case 0:
                         st.error('Không tìm thấy tài khoản')
                     case 1:
-                        st.session_state.dem_sai_mk += 1
+                        st.session_state.wrong_password_count += 1
                         st.error(f'Sai mật khẩu. Quý khách sẽ bị chuyển về trang chủ sau **:red[{3-st.session_state.dem_sai_mk}]** lần nữa')
                     case 2:
                         st.session_state.previous_page.append(st.session_state.current_page)
@@ -510,8 +513,8 @@ def login_form():
                             case 'viewer':
                                 st.session_state.power_level = 1    
                         st.switch_page('pages/login_success.py')
-    if st.session_state.dem_sai_mk > 2:
-        st.session_state.dem_sai_mk = 0                            
+    if st.session_state.wrong_password_count > 2:
+        st.session_state.wrong_password_count = 0                            
         st.switch_page('pages/password_wrong.py')
         
 # Nhóm chức năng cài đặt

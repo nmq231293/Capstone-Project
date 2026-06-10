@@ -6,10 +6,11 @@ from helpers import signup_form, switch_page_confirm
 if st.session_state.login_state == True:
     st.switch_page('pages/re_submit.py')
 
-st.header('**:red[ĐĂNG KÝ]**', width='stretch',text_alignment='left')
-# st.session_state.current_page = 'pages/signup.py'
+text = st.session_state.text
+
+st.header(f'**:red[{text["signup_title"].upper()}]**', width='stretch',text_alignment='left')
 
 signup_form()
 
-if st.button('Quay về trang chủ', icon='🏡'):
+if st.button(f'{text["back_to_home_button"]}', icon='🏡'):
     switch_page_confirm('pages/home.py')
