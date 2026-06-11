@@ -212,8 +212,10 @@ DICTIONARY = {
         # --- FORM CHUYỂN TIỀN (TRANSFER FORM) ---
         'tf_lbl_receiver': 'Số tài khoản người nhận',
         'tf_placeholder_receiver': 'Nhập số tài khoản người nhận',
+        'tf_receiver_name': 'Tên người nhận: **:green[{}]**',
         'tf_lbl_amount': 'Số tiền cần chuyển',
         'tf_placeholder_amount': 'Nhập số tiền cần chuyển',
+        'tf_amount_in_text': 'Số tiền bằng chữ: **:green[{}]**',
         'tf_limit_hint': 'Chuyển khoản ít nhất 10.000 đồng và nhiều nhất 500.000.000 đồng trong một lần chuyển',
         'tf_lbl_content': 'Nội dung',
         'tf_placeholder_content': 'Nhập nội dung chuyển khoản',
@@ -222,6 +224,7 @@ DICTIONARY = {
         'tf_err_self_transfer': 'Đây là số tài khoản của quý khách, vui lòng điền số tài khoản khác',
         'tf_err_min_limit': 'Số tiền chuyển không được nhỏ hơn 10.000 đồng',
         'tf_err_content_empty': 'Nội dung không được bỏ trống',
+        'tf_err_not_found': 'Không tìm thấy số tài khoản người nhận',
         'tf_err_insufficient': 'Không đủ tiền để chuyển',
 
         # --- FORM XÁC NHẬN CHUYỂN TIỀN (TRANSFER REHEARSAL) ---
@@ -231,6 +234,7 @@ DICTIONARY = {
         'rh_sender_acc': 'Số tài khoản người gửi: **:green[{}]**',
         'rh_receiver': 'Người nhận: **:green[{}]**',
         'rh_receiver_acc': 'Số tài khoản người nhận: **:green[{}]**',
+        'rh_content': 'Nội dung chuyển khoản: **:green[{}]**',
         'rh_lbl_pass': 'Mật khẩu xác nhận',
         'rh_placeholder_pass': 'Nhập lại mật khẩu để xác nhận chuyển khoản',
         'rh_btn_submit': 'Xác nhận chuyển tiền',
@@ -350,8 +354,10 @@ DICTIONARY = {
         # --- TRANSFER FORM (EN) ---
         'tf_lbl_receiver': 'Recipient Account Number',
         'tf_placeholder_receiver': 'Enter recipient account number',
+        'tf_receiver_name': 'Recipient Name: **:green[{}]**',
         'tf_lbl_amount': 'Transfer Amount',
         'tf_placeholder_amount': 'Enter amount to transfer',
+        'tf_amount_in_text': 'Amount in words: **:green[{}]**',
         'tf_limit_hint': 'Transfer limit: Minimum 10,000 VND and Maximum 500,000,000 VND per transaction',
         'tf_lbl_content': 'Message / Reference',
         'tf_placeholder_content': 'Enter transfer reference description',
@@ -360,6 +366,7 @@ DICTIONARY = {
         'tf_err_self_transfer': 'This is your own account number, please enter a different account number',
         'tf_err_min_limit': 'Transfer amount cannot be less than 10,000 VND',
         'tf_err_content_empty': 'Reference message cannot be empty',
+        'tf_err_not_found': 'Recipient account number not found',
         'tf_err_insufficient': 'Insufficient funds to complete this transfer',
 
         # --- REHEARSAL FORM (EN) ---
@@ -369,6 +376,7 @@ DICTIONARY = {
         'rh_sender_acc': 'Sender Account: **:green[{}]**',
         'rh_receiver': 'Recipient: **:green[{}]**',
         'rh_receiver_acc': 'Recipient Account: **:green[{}]**',
+        'rh_content': 'Transfer Reference/Message: **:green[{}]**',
         'rh_lbl_pass': 'Verification Password',
         'rh_placeholder_pass': 'Re-enter your password to confirm fund transfer',
         'rh_btn_submit': 'Confirm Transfer',

@@ -554,40 +554,48 @@ def money_transfer(sender:str, receiver:str, transfer_amount:int):
 
 # Form tạo yêu cầu chuyển tiền
 def money_transfer_form():
+    global df
+    
     text = st.session_state.text 
     stkc = st.session_state.receiver_num
     tien_ckc = st.session_state.transfer_amount
     
-    with st.form('form_chuyen_khoan', clear_on_submit=False):
-        stk = st.text_input(text['tf_lbl_receiver'], value=stkc, max_chars=8, placeholder=text['tf_placeholder_receiver'])        
-        tien_ck = st.number_input(text['tf_lbl_amount'], value=tien_ckc, max_value=500000000, step=100000, placeholder=text['tf_placeholder_amount'], format='%u')
-        st.write(text['tf_limit_hint'])
-        noi_dung = st.text_input(text['tf_lbl_content'], max_chars=99, placeholder=text['tf_placeholder_content'])
+    stk = st.text_input(text['tf_lbl_receiver'], value=stkc, max_chars=8, placeholder=text['tf_placeholder_receiver'])
+    if stk in df.index:
+        st.write(f':grey[{format(df.loc[stk, 'Name'])}]')
         
-        if st.form_submit_button(text['tf_btn_submit']):
-            if stk == '':
-                st.error(text['tf_err_acc_empty'])
-            elif stk == st.session_state.acc_num:
-                st.error(text['tf_err_self_transfer'])
-            elif tien_ck < 10000:
-                st.error(text['tf_err_min_limit'])
-            elif noi_dung == '':
-                st.error(text['tf_err_content_empty'])
-            else:
-                match transfer_check(stk, tien_ck):
-                    case 0:
-                        st.error(text['tf_err_not_found'])
-                    case 1:
-                        st.error(text['tf_err_insufficient'])
-                    case 2:
-                        st.session_state.previous_page.append(st.session_state.current_page)
-                        st.session_state.receiver_num = stk
-                        st.session_state.transfer_amount = tien_ck
-                        st.session_state.transfer_state = 1
-                        st.switch_page('pages/transfer_rehearsal.py')
+    tien_ck = st.number_input(text['tf_lbl_amount'], value=tien_ckc, max_value=500000000, step=100000, placeholder=text['tf_placeholder_amount'], format='%u')
+    if 100000 <= tien_ck <= 500000000:
+        st.write(f':grey[{format(money_number_to_text(tien_ck))}]')
+    else:
+        st.write(f":grey[{text['tf_limit_hint']}]")
+    noi_dung = st.text_input(text['tf_lbl_content'], max_chars=99, placeholder=text['tf_placeholder_content'])
+    
+    if st.button(text['tf_btn_submit']):
+        if stk == '':
+            st.error(text['tf_err_acc_empty'])
+        elif stk == st.session_state.acc_num:
+            st.error(text['tf_err_self_transfer'])
+        elif tien_ck < 10000:
+            st.error(text['tf_err_min_limit'])
+        elif noi_dung == '':
+            st.error(text['tf_err_content_empty'])
+        else:
+            match transfer_check(stk, tien_ck):
+                case 0:
+                    st.error(text['tf_err_not_found'])
+                case 1:
+                    st.error(text['tf_err_insufficient'])
+                case 2:
+                    st.session_state.previous_page.append(st.session_state.current_page)
+                    st.session_state.receiver_num = stk
+                    st.session_state.transfer_amount = tien_ck
+                    st.session_state.transfer_state = 1
+                    st.session_state.transfer_content = noi_dung
+                    st.switch_page('pages/transfer_rehearsal.py')
 
 # Hàm chính chuyển số tiền thành chữ (Tự động nhận diện Tiếng Việt / Tiếng Anh)
-def doc_so_tien(n):
+def money_number_to_text(n):
     # ==============================================================================
     # TRƯỜNG HỢP 1: ĐỌC TIẾNG ANH
     # ==============================================================================
@@ -684,19 +692,35 @@ def doc_so_tien(n):
 def transfer_rehearsal():
     text = st.session_state.text 
     
-    with st.form('form_kiem_tra_ck', clear_on_submit=True):
-        # Định dạng dấu phẩy phân tách hàng nghìn cho số tiền
-        formatted_money = format(st.session_state.transfer_amount, ',')
+    # Định dạng dấu phẩy phân tách hàng nghìn cho số tiền
+    formatted_money = format(st.session_state.transfer_amount, ',')
+    
+    # Xác định đơn vị tiền tệ dựa trên ngôn ngữ
+    unit = "VND" if st.session_state.lang == 'en' else "VNĐ"
+    
+    # Tạo danh sách các cặp thông tin (Nhãn trái, Giá trị phải) để lặp cho gọn code
+    receipt_data = [
+        (text['rh_amount'].replace(': **:green[{} VNĐ]**', '').replace(': **:green[{} VND]**', ''), f"{formatted_money} {unit}"),
+        (text['rh_words'].replace(': **:green[{}]**', ''), money_number_to_text(st.session_state.transfer_amount)),
+        (text['rh_sender'].replace(': **:green[{}]**', ''), df.loc[st.session_state.acc_num, 'Name']),
+        (text['rh_sender_acc'].replace(': **:green[{}]**', ''), st.session_state.acc_num),
+        (text['rh_receiver'].replace(': **:green[{}]**', ''), df.loc[st.session_state.receiver_num, 'Name']),
+        (text['rh_receiver_acc'].replace(': **:green[{}]**', ''), st.session_state.receiver_num),
+        (text['rh_content'].replace(': **:green[{}]**', ''), st.session_state.transfer_content)
+    ]
+    
+    with st.form('form_kiem_tra_ck', clear_on_submit=True, width='stretch'):
+        # Vòng lặp vẽ giao diện biên lai bám 2 lề trái/phải
+        for label, value in receipt_data:
+            c1, c2 = st.columns([2, 3])
+            with c1:
+                st.write(label)
+            with c2:
+                # Canh lề phải và tô màu xanh lá cho phần dữ liệu biến
+                st.markdown(f'<div style="text-align: right; color: #2ecc71; font-weight: bold;">{value}</div>', unsafe_allow_html=True)
         
-        # In các thông tin biên lai
-        st.write(text['rh_amount'].format(formatted_money))
-        st.write(text['rh_words'].format(doc_so_tien(st.session_state.transfer_amount)))
-        st.write(text['rh_sender'].format(df.loc[st.session_state.acc_num, 'Name']))
-        st.write(text['rh_sender_acc'].format(st.session_state.acc_num))
-        st.write(text['rh_receiver'].format(df.loc[st.session_state.receiver_num, 'Name']))
-        st.write(text['rh_receiver_acc'].format(st.session_state.receiver_num))
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        # Ô nhập mật khẩu để xác thực giao dịch
         mat_khau = st.text_input(text['rh_lbl_pass'], type='password', max_chars=24, placeholder=text['rh_placeholder_pass'])
         
         if st.form_submit_button(text['rh_btn_submit']):
@@ -705,12 +729,10 @@ def transfer_rehearsal():
             else:
                 match login_check(st.session_state.acc_num, mat_khau):
                     case 1:
-                        # Đếm số lần sai mật khẩu
                         st.session_state.wrong_password_count += 1
                         remaining_attempts = 3 - st.session_state.wrong_password_count
                         st.error(text['rh_err_wrong_pass'].format(remaining_attempts))
                     case 2:
-                        # Thực hiện lệnh chuyển tiền thực tế
                         money_transfer(st.session_state.acc_num, st.session_state.receiver_num, st.session_state.transfer_amount)
                         st.session_state.receiver_num = ''
                         st.session_state.transfer_amount = 0
@@ -718,7 +740,6 @@ def transfer_rehearsal():
                         st.session_state.transfer_state = 2
                         st.switch_page('pages/transfer_success.py')
                         
-    # Nếu nhập sai quá 3 lần, tự động reset thông tin giao dịch và khóa/chuyển trang báo lỗi
     if st.session_state.wrong_password_count > 2:
         st.session_state.receiver_num = ''
         st.session_state.transfer_amount = 0     

@@ -9,7 +9,7 @@ text = st.session_state.text
 st.header(f'**:red[{text["transfer_title"].upper()}]**', width='stretch',text_alignment='left')
 
 if st.session_state.login_state == True:
-    st.write(f'{text["available_balance"]}: {format(available_balance(st.session_state.acc_num), ",")} VNĐ')
+    st.write(f'{text["available_balance"]}: :green[{format(available_balance(st.session_state.acc_num), ",")} VNĐ]')
 
 if st.session_state.transfer_state <2:
     money_transfer_form()
