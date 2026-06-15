@@ -142,45 +142,49 @@ def embed_chatbot():
 
 
 # Khởi tạo đọc dữ liệu bank accounts
+def df_init():
+    # Hàm lấy secrets để đọc file google sheet
+    def get_gspread_client():
 
-# Hàm lấy secrets để đọc file google sheet
-def get_gspread_client():
+        credentials_dict = dict(st.secrets["connections"]["gsheets"])
 
-    credentials_dict = dict(st.secrets["connections"]["gsheets"])
-
-    gc = gspread.service_account_from_dict(credentials_dict)
-    return gc
-
-
-# Đọc file vào dataframe
-
-gc = get_gspread_client()
-
-spreadsheet_url = st.secrets["connections"]["gsheets"]["toplevel_url"]
-sh = gc.open_by_url(spreadsheet_url)
-
-worksheet = sh.worksheet("bank_account")
-
-data = worksheet.get_all_records()
-df = pd.DataFrame(data)
+        gc = gspread.service_account_from_dict(credentials_dict)
+        return gc
 
 
-df = df.astype({
-                'Name' : 'str',
-                'Phone' : 'str',
-                'Email' : 'str',
-                'Password' : 'str',
-                'Balance' : 'int64',
-                'Session' : 'str'
-                })
+    # Đọc file vào dataframe
 
-# Xử lý dataframe
+    gc = get_gspread_client()
 
-df['ID'] = pd.Series(f'{x:08}' if str(x).isdigit() else x for x in list(df['ID']))
-df['Phone'] = '0' + df['Phone']
-pd.to_datetime(df['DoB'])
-df.set_index('ID', inplace=True)
-df.sort_index(inplace=True)
+    spreadsheet_url = st.secrets["connections"]["gsheets"]["toplevel_url"]
+    sh = gc.open_by_url(spreadsheet_url)
+
+    worksheet = sh.worksheet("bank_account")
+
+    data = worksheet.get_all_records()
+    df = pd.DataFrame(data)
+
+
+    df = df.astype({
+                    'Name' : 'str',
+                    'Phone' : 'str',
+                    'Email' : 'str',
+                    'Password' : 'str',
+                    'Balance' : 'int64',
+                    'Session' : 'str',
+                    'Previous_Session' : 'str'
+                    })
+
+    # Xử lý dataframe
+
+    df['ID'] = pd.Series(f'{x:08}' if str(x).isdigit() else x for x in list(df['ID']))
+    df['Phone'] = '0' + df['Phone']
+    pd.to_datetime(df['DoB'])
+    df.set_index('ID', inplace=True)
+    df.sort_index(inplace=True)
+    return worksheet, df
+
+worksheet, df = df_init()
 
 
 # Hàm callback xử lý riêng cho Ngôn ngữ (Chạy trước khi render lại trang)
@@ -190,14 +194,74 @@ def on_language_change():
     st.session_state.lang = new_lang
     st.query_params["lang"] = new_lang
 
+# CÁC LOẠI HỘP THOẠI:
+# Hộp thoại báo đã đăng nhập nơi khác hoặc hết phiên đăng nhập:
+
+
+@st.dialog(':red[==================================]')
+def session_expired(reason:str = 'expired'):
+    global worksheet, df
+    
+    worksheet, df = df_init()
+    
+    text = st.session_state.text
+
+    if reason == 'expired':
+        session_expired_dialog_title = text['dialog_session_expired']
+        session_expired_dialog_text = text['dialog_session_expired_info']
+    elif reason == 'timeout':
+        session_expired_dialog_title = text['dialog_session_timeout']
+        session_expired_dialog_text = text['dialog_session_timeout_info']        
+    else:
+        session_expired_dialog_title = text['dialog_session_hijacked']
+        session_expired_dialog_text = text['dialog_session_hijacked_info']
+        
+    st.header(f'**:red[{'⚠️' + session_expired_dialog_title.upper() + '⚠️'}]**',text_alignment='center')
+    
+    st.markdown(f':orange[{session_expired_dialog_text}]')
+    
+    if reason == 'hijacked':
+        if st.button(f':red[{text["change_password_button"]}]', icon='🔓'):
+            df.loc[st.session_state.acc_num, 'Previous_Session'] = '0'
+            del st.session_state.session_expired
+            work_sheet_update(worksheet, df)        
+            st.query_params.clear()
+            st.session_state.password_change_need = True
+            st.session_state.previous_page.append(st.session_state.current_page)
+            st.switch_page('pages/account_settings.py')        
+    
+    if st.button(f':green[{text["to_login_button"]}]', icon='🔑'):
+        if reason == 'expired' or reason == 'timeout':
+            df.loc[st.session_state.acc_num, 'Session'] = '0'
+        else:
+            df.loc[st.session_state.acc_num, 'Previous_Session'] = '0'
+        del st.session_state.session_expired
+        work_sheet_update(worksheet, df)
+        st.query_params.clear()
+        st.session_state.previous_page.append(st.session_state.current_page)
+        st.switch_page('pages/login.py')
+    
+    if st.button(f"**:orange[{text.get('dialog_stay_btn', 'Ở lại trang này')}]**", icon= '❗'):
+        if reason == 'expired' or reason == 'timeout':
+            df.loc[st.session_state.acc_num, 'Session'] = '0'
+        else:
+            df.loc[st.session_state.acc_num, 'Previous_Session'] = '0'
+        del st.session_state.session_expired
+        work_sheet_update(worksheet, df)
+        st.query_params.clear()
+        st.rerun()
+        
+    st.header(':red[==================================]')
+
+# Hộp thoại báo khi rời những trang điền form
+
 def switch_page_dialog_title():
     if 'text' in st.session_state:
         result = st.session_state.text.get('dialog_leave_title', 'Xác nhận rời trang')
     else:
         result = 'Xác nhận rời trang'
     return result
-    
-# Hộp thoại báo khi rời những trang điền form
+
 @st.dialog(':orange[==================================]')
 def switch_page_confirm(page_path, page_trace = True):
     
@@ -326,9 +390,8 @@ def new_id_suggest(init_id:str, suggest_num:int):
     return random_good_id
 
 # Hàm xuất df ra lại google sheet
-def work_sheet_update():
-    global df, worksheet
-
+def work_sheet_update(worksheet, df = df_init()):
+    
     worksheet.clear()
 
     df['DoB'] = df['DoB'].astype(str)
@@ -345,7 +408,8 @@ def work_sheet_update():
 
 # Hàm tạo tài khoản mới
 def account_signup(stk, ten, ngay_sinh, sdt, email, matkhau, sodu):
-    global df
+    worksheet, df = df_init()
+
     df.loc[stk] = pd.Series({
                             'Name':ten,
                             'DoB':ngay_sinh,
@@ -356,7 +420,7 @@ def account_signup(stk, ten, ngay_sinh, sdt, email, matkhau, sodu):
                             })
     df.sort_index(inplace=True)
 
-    work_sheet_update()
+    work_sheet_update(worksheet, df)
 
 # Hàm hỗ trợ gợi ý ID là số ngày sinh nếu khả dụng khi nhập vào form đăng ký
 def process_temp_DoB():
@@ -492,7 +556,11 @@ def login_check(stk:str, mat_khau:str):
 
 # Form đăng nhập
 def login_form():
-    text = st.session_state.text 
+    global worksheet, df
+    
+    worksheet, df = df_init()
+    
+    text = st.session_state.text
     with st.form('form_dang_nhap', clear_on_submit=False):
         stk = st.text_input(text['lg_lbl_acc'], value=st.session_state.acc_num, max_chars=8, placeholder=text['lg_placeholder_acc'])        
         mat_khau = st.text_input(text['lg_lbl_pass'], type='password', max_chars=24, placeholder=text['lg_placeholder_pass'])
@@ -527,10 +595,15 @@ def login_form():
                         
                         # Lấy thông tin hệ điều hành + trình duyệt của bạn
                         user_browser = st.context.headers.get("User-Agent", "UnknownBrowser")
-                        
+                        session_value = str(df.loc[stk, 'Session'])
+
                         # Lưu chuỗi kết hợp (Thời gian|Thông tin trình duyệt) lên Google Sheet
+                        if "|" in session_value:
+                            sheet_time, sheet_browser = session_value.split("|", 1) # Sử dụng split("|", 1) để tránh lỗi nếu chuỗi trình duyệt có dấu |
+                            if user_browser != sheet_browser:
+                                df.loc[stk, 'Previous_Session'] = df.loc[stk, 'Session']
                         df.loc[stk, 'Session'] = f"{login_timestamp}|{user_browser}"
-                        work_sheet_update()
+                        work_sheet_update(worksheet, df)
                         
                         # Mã hóa token lên URL như cũ
                         from itsdangerous import URLSafeSerializer
@@ -552,11 +625,13 @@ def login_form():
         st.switch_page('pages/password_wrong.py')
 
 # Hàm đăng xuất:
-def logout():
-    # Trả giá trị phiên làm việc trên Google Sheet về '0' để vô hiệu hóa Token cũ vĩnh viễn
-    df.loc[st.session_state.acc_num, 'Session'] = '0'
-    work_sheet_update()
-    
+def logout(cause:str = 'manual'):
+    worksheet, df = df_init()
+
+    if cause == 'manual':
+        # Trả giá trị phiên làm việc trên Google Sheet về '0' để vô hiệu hóa Token cũ vĩnh viễn.
+        df.loc[st.session_state.acc_num, 'Session'] = '0'
+        work_sheet_update(worksheet, df)
     st.session_state.login_state = False
     st.session_state.login_noti = False
     st.session_state.acc_num = ''
@@ -568,12 +643,19 @@ def logout():
     st.session_state.transfer_state = 0
     st.session_state.signup_state = False
     st.session_state.available_id_list = []
-    st.session_state.logout_state = True
-    # Làm sạch hoàn toàn thanh URL và điều hướng về trang chủ
-    st.query_params.clear()
-    if st.session_state.current_page != 'pages/home.py':
-        st.session_state.previous_page.append(st.session_state.current_page)
-        st.switch_page('pages/home.py')    
+    
+    if cause == 'manual':
+        # Làm sạch hoàn toàn thanh URL và điều hướng về trang chủ
+        st.query_params.clear()
+        st.session_state.logout_state = True
+        if st.session_state.current_page != 'pages/home.py':
+            st.session_state.previous_page.append(st.session_state.current_page)
+            st.switch_page('pages/home.py')       
+    else:
+        st.query_params['session_expired'] = cause
+        st.session_state.logout_state = False
+        st.rerun()
+
 
 
 # Hàm lấy số dư tài khoản

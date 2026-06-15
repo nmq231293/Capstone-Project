@@ -140,6 +140,7 @@ DICTIONARY = {
         'settings_button': 'Cài đặt',
         'account_button': 'Tài khoản',
         'logout_button': 'Đăng xuất',
+        'change_password_button': 'Đổi mật khẩu',
         'logged_in_noti': 'Đăng nhập thành công',
         'logged_out_noti': 'Đã đăng xuất',
         'login_success_spinner': 'Quý khách sẽ quay về trang chủ sau 3 giây ...',
@@ -155,6 +156,12 @@ DICTIONARY = {
         'AI_chatbot_close_button': 'Đóng cửa sổ trò chuyện',
 
         # --- HỘP THOẠI XÁC NHẬN RỜI TRANG ---
+        'dialog_session_expired': 'Phiên đăng nhập hết hạn',
+        'dialog_session_expired_info': 'Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại!',
+        'dialog_session_timeout': 'Quá thời gian chờ',
+        'dialog_session_timeout_info': 'Bạn đã không hoạt động trong hơn 15 phút. Vui lòng đăng nhập lại!',
+        'dialog_session_hijacked' : 'Đăng nhập nơi khác',
+        'dialog_session_hijacked_info' : 'Tài khoản của bạn đã được đăng nhập trên một thiết bị khác. Nếu không phải là bạn, hãy đổi mật khẩu NGAY!!!',
         'dialog_leave_title': 'Xác nhận rời trang',
         'dialog_leave_warning': 'Nếu rời khỏi trang, nội dung bạn đã điền sẽ không được lưu. Bạn có chắc muốn rời khỏi trang này chứ?',
         'dialog_leave_btn': 'Rời khỏi trang này',
@@ -283,6 +290,7 @@ DICTIONARY = {
         'settings_button': 'Settings',
         'account_button': 'Account',
         'logout_button': 'Logout',
+        'change_password_button' : 'Change password',
         'logged_in_noti': 'Successfully logged in',
         'logged_out_noti': 'Successfully logged out',
         'login_success_spinner': 'You will be redirected to home page after 3 seconds ...',
@@ -298,6 +306,12 @@ DICTIONARY = {
         'AI_chatbot_close_button': 'Close chat window',
 
         # --- CONFIRM LEAVE PAGE DIALOG (EN) ---
+        'dialog_session_expired' : 'Expired session',
+        'dialog_session_expired_info': 'Your session has expired. Please log in again!',
+        'dialog_session_timeout': 'Timeout due to inactivity',
+        'dialog_session_timeout_info': 'You were inactive for more than 15 minutes. Please log in again!',
+        'dialog_session_hijacked' : 'Account on other device',
+        'dialog_session_hijacked_info' : 'Your account has just been logged in on another device. If it was not you, please change your password NOW!!!',
         'dialog_leave_title': 'Confirm leaving this page',
         'dialog_leave_warning': 'If you leave, your unsaved progress on this form will be lost. Are you sure you want to proceed?',
         'dialog_leave_btn': 'Leave this page',
