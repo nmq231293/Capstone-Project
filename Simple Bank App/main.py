@@ -3,6 +3,7 @@ import time
 from itsdangerous import URLSafeSerializer, BadSignature
 from helpers import df, df_init, on_language_change, switch_page_check, embed_chatbot, logout, session_expired
 from dictionary_data import DICTIONARY
+import base64
 
 # Quy định bắt buộc: Thiết lập cấu hình trang nằm ở dòng đầu tiên
 st.set_page_config(layout='wide')
@@ -23,7 +24,7 @@ LANG_LABELS = {
     "en": "English"
 }
 
-
+st.title(f'**:rainbow[{st.session_state.text["main_title"]}]**', width='stretch', text_alignment='center')
 col1, col2, col3, col4 = st.columns(4)
 with col4:
     
@@ -149,7 +150,7 @@ if st.session_state.get("login_state"):
 
 
 
-st.title(f'**:rainbow[{st.session_state.text["main_title"]}]**', width='stretch', text_alignment='center')
+# st.title(f'**:rainbow[{st.session_state.text["main_title"]}]**', width='stretch', text_alignment='center')
 
 embed_chatbot()
 
@@ -207,10 +208,62 @@ if 'power_level' not in st.session_state:
 if 'password_change_need' not in st.session_state:
     st.session_state.password_change_need = False
 
+# Hàm mã hóa ảnh nội bộ sang Base64
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# Tải ảnh lên và mã hóa (Thay 'background.jpg' bằng tên tệp ảnh của bạn)
+# Tệp ảnh này nên để cùng thư mục với file app.py
+try:
+    img_base64 = get_base64_image("Simple Bank App/wallpaper/reynoldbank.jpg")
+    
+    # Chèn CSS với chuỗi mã hóa Base64
+    st.markdown(f"""
+        <style>
+            [data-testid="stAppViewContainer"] {{
+                background-image: url("data:image/jpg;base64,{img_base64}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            [data-testid="stHeader"] {{
+                background: rgba(0,0,0,0);
+            }}
+        </style>
+    """, unsafe_allow_html=True)
+except FileNotFoundError:
+    st.error("Không tìm thấy tệp ảnh 'Simple Bank App/wallpaper/reynoldbank.jpg'. Vui lòng kiểm tra lại đường dẫn.")
 
 st.markdown(
     """
     <style>
+    # [data-testid="stAppViewContainer"] {
+    #     background-image: url("https://wallpapers.com/images/high/4d-ultra-hd-wide-space-wm74w1lh3izaum4a.webp"); /* Thay URL ảnh của bạn tại đây */
+    #     background-size: cover;          /* Giúp ảnh bao phủ toàn màn hình */
+    #     background-position: center;     /* Căn giữa ảnh nền */
+    #     background-repeat: no-repeat;    /* Không lặp lại ảnh */
+    #     background-attachment: fixed;    /* Cố định nền khi cuộn trang */
+    # }
+    
+    # /* Tùy chọn: Làm nền của phần nội dung hơi mờ để dễ đọc chữ */
+    # [data-testid="stHeader"] {
+    #     background: rgba(0,0,0,0);       /* Ẩn nền trắng mặc định của header */
+    # }
+    /* Định dạng cho tất cả các nút bấm Streamlit thông thường */
+    div[data-testid="stButton"] button {
+        background-color: #4ca5af !important; /* Thay bằng màu nền bạn muốn */
+        color: #FFFFFF !important;            /* Thay bằng màu chữ bạn muốn */
+        border-radius: 8px !important;        /* Bo góc nút (nếu muốn) */
+        border: none !important;              /* Xóa viền mặc định */
+    }
+    
+    /* Hiệu ứng khi di chuột qua nút (Hover) */
+    div[data-testid="stButton"] button:hover {
+        background-color: #45a049 !important; /* Màu nền khi di chuột qua */
+        color: #FFFF00 !important;            /* Màu chữ khi di chuột qua */
+    }
     [data-testid="stWidgetLabel"] p {
         font-weight: bold;
         color: #ffaf53 !important;
@@ -231,19 +284,18 @@ with col1:
         if st.button(st.session_state.text['back_button'], icon='🔙'):
             switch_page_check(st.session_state.previous_page[-1], False)
 
-setting_options = [f'🙎🏻‍♂️ :green[{st.session_state.text["account_button"]}]', f'🔑 :red[{st.session_state.text["logout_button"]}]']
-if st.session_state.power_level > 0:
-    setting_options.insert(0, f'👑 :violet[{st.session_state.text["admin_power_title"]}]')
-
 with col4:
     if st.session_state.login_state:
+        setting_options = [f'🙎🏻‍♂️ :green[{st.session_state.text["account_button"]}]', f'🔑 :red[{st.session_state.text["logout_button"]}]']
+        if st.session_state.power_level > 0:
+            setting_options.insert(0, f'👑 :violet[{st.session_state.text["admin_power_title"]}]')
         if settings_menu := st.menu_button(f'{st.session_state.text["settings_button"]}', setting_options, icon='⚙️', type='secondary', width='content'):
             if settings_menu == f'👑 :violet[{st.session_state.text["admin_power_title"]}]':
                 st.session_state.previous_page.append(st.session_state.current_page)
-                st.switch_page('pages/admin_power.py')
+                switch_page_check('pages/admin_power.py')
             elif settings_menu == f'🙎🏻‍♂️ :green[{st.session_state.text["account_button"]}]':
                 st.session_state.previous_page.append(st.session_state.current_page)
-                st.switch_page('pages/account_settings.py')
+                switch_page_check('pages/account_settings.py')
             elif settings_menu == f'🔑 :red[{st.session_state.text["logout_button"]}]':
                 logout()
 

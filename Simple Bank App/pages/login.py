@@ -9,5 +9,7 @@ text = st.session_state.text
 st.header(f'**:red[{text["login_title"].upper()}]**', width='stretch',text_alignment='left')
 
 login_form()
-if st.button(f'{text["back_to_home_button"]}', icon='🏡'):
-    switch_page_confirm('pages/home.py')
+if st.button(f'{text['signup_button']}', icon='🔐'):
+    st.session_state.available_id_list = []
+    st.session_state.previous_page.append(st.session_state.current_page)
+    st.switch_page('pages/signup.py')

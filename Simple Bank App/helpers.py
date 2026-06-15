@@ -13,6 +13,25 @@ from streamlit_float import *
 st.markdown(
     """
     <style>
+    /* Tùy chọn: Làm nền của phần nội dung hơi mờ để dễ đọc chữ */
+    [data-testid="stHeader"] {
+        background: rgba(0,0,0,0);       /* Ẩn nền trắng mặc định của header */
+    }
+    
+    /* Định dạng cho tất cả các nút bấm Streamlit thông thường */
+    div[data-testid="stButton"] button {
+        background-color: #4ca5af !important; /* Thay bằng màu nền bạn muốn */
+        color: #FFFFFF !important;            /* Thay bằng màu chữ bạn muốn */
+        border-radius: 8px !important;        /* Bo góc nút (nếu muốn) */
+        border: none !important;              /* Xóa viền mặc định */
+    }
+    
+    /* Hiệu ứng khi di chuột qua nút (Hover) */
+    div[data-testid="stButton"] button:hover {
+        background-color: #45a049 !important; /* Màu nền khi di chuột qua */
+        color: #FFFF00 !important;            /* Màu chữ khi di chuột qua */
+    }
+    
     [data-testid="stWidgetLabel"] p {
         color: #FF5733 !important; /* Màu cam đỏ */
     }

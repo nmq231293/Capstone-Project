@@ -12,5 +12,7 @@ st.header(f'**:red[{text["signup_title"].upper()}]**', width='stretch',text_alig
 
 signup_form()
 
-if st.button(f'{text["back_to_home_button"]}', icon='🏡'):
-    switch_page_confirm('pages/home.py')
+if st.button(f'{text["login_button"]}', icon='🔑'):
+    st.session_state.available_id_list = []
+    st.session_state.previous_page.append(st.session_state.current_page)
+    st.switch_page('pages/login.py')

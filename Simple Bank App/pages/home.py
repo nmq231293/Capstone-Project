@@ -19,6 +19,7 @@ if not st.session_state.login_state:
 
     with col2:
         if st.button(f'{text["signup_title"]}', icon='🔐'):
+            st.session_state.available_id_list = []
             st.session_state.previous_page.append(st.session_state.current_page)
             st.switch_page('pages/signup.py')
 
