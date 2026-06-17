@@ -216,7 +216,7 @@ def session_expired(reason:str = 'expired'):
 
     c1, c2, c3 = st.columns([3,3,2])
     with c1:    
-        if st.button(f'**:green[{text["to_login_button"]}]**', icon='🔑', key="btn_sess_login"):
+        if st.button(f'**:green[{text["relogin_button"]}]**', icon='🔑', key="btn_sess_login"):
             if reason == 'expired' or reason == 'timeout':
                 df.loc[st.session_state.acc_num, 'Session'] = '0'
             else:
