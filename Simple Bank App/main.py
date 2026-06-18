@@ -150,7 +150,7 @@ if st.session_state.get("login_state"):
         new_timestamped_id = f"{last_activity_timestamp}|{st.session_state.acc_num}"
         auth_serializer = URLSafeSerializer(st.secrets["SECRET_KEY"])
         st.query_params["auth_token"] = auth_serializer.dumps(new_timestamped_id)
-    if CURRENT_TIME - st.session_state.last_activity_time <= 10:
+    if CURRENT_TIME - st.session_state.last_activity_time <= 600:
         st.session_state.last_activity_time = CURRENT_TIME
     else:
         st.session_state.session_expired = 'timeout'
