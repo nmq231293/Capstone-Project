@@ -422,7 +422,7 @@ st.markdown(
     }
     div[data-baseweb="input"]:focus-within, div[data-baseweb="select"]:focus-within {
         border-color: #a855f7 !important;                         
-        box-shadow: 0 0 12px rgba(16 Prompt8, 85, 247, 0.5) !important;
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
     }
 
     /* ==============================================================================
