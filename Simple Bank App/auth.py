@@ -82,7 +82,6 @@ def session_expired(reason: str = 'expired'):
             if st.button(f'**:green[{text["change_password_button"]}]**', icon='🔓', key="btn_hj_change_pass"):
                 update_accounts_safely([st.session_state.acc_num], invalidate_all_sessions)
                 del st.session_state.session_expired
-                del st.session_state.acc_num
                 del st.session_state.auth_token
                 st.query_params.clear()
                 st.session_state.password_change_need = True
