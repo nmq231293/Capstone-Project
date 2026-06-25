@@ -170,6 +170,11 @@ def df_init():
     df['ID'] = pd.Series(f'{x:08}' if str(x).isdigit() else x for x in list(df['ID']))
     df['Phone'] = '0' + df['Phone']
     pd.to_datetime(df['DoB'])
+
+    # Ghi nhớ vị trí dòng THẬT trên Google Sheet (trước khi sắp xếp lại trong bộ nhớ) -
+    # để các lần ghi sau biết đúng dòng cần sửa, không cần ghi đè cả sheet.
+    df['_sheet_row'] = range(2, len(df) + 2)
+
     df.set_index('ID', inplace=True)
     df.sort_index(inplace=True)
     return worksheet, df
@@ -418,7 +423,19 @@ def new_id_suggest(init_id:str, suggest_num:int):
 # CÁC HÀM XUẤT DỮ LIỆU VÀO GOOGLE SHEET
 # ==============================================================================
 
-# Hàm xuất df ra lại google sheet
+SHEET_COLUMNS = ['ID', 'Name', 'DoB', 'Phone', 'Email', 'Password', 'Balance',
+                'Session', 'Previous_Session', 'Version', 'Power_Level']
+
+# Hàm chỉnh sửa ô trong google sheet:
+def update_account_rows(worksheet, df, account_ids):
+    for acc_id in account_ids:
+        row_series = df.loc[acc_id, [c for c in SHEET_COLUMNS if c != 'ID']].copy()
+        row_series['DoB'] = str(row_series['DoB'])
+        row_values = [acc_id] + [v.item() if hasattr(v, 'item') else v for v in row_series.tolist()]
+        sheet_row_number = int(df.loc[acc_id, '_sheet_row'])
+        worksheet.update(range_name=f"A{sheet_row_number}", values=[row_values])
+        
+# Hàm xuất df ra lại google sheet:
 def work_sheet_update(worksheet, df = df_init()):
     
     worksheet.clear()
@@ -447,21 +464,9 @@ def account_signup(stk, ten, ngay_sinh, sdt, email, matkhau, sodu):
     if stk in fresh_df.index:
         raise AccountIdTakenError(stk)
 
-    fresh_df.loc[stk] = pd.Series({
-                            'Name':ten,
-                            'DoB':ngay_sinh,
-                            'Phone':sdt,
-                            'Email':email,
-                            'Password':hash_password(matkhau),
-                            'Balance':sodu,
-                            'Session':'0',
-                            'Previous_Session':'0',
-                            'Version':0,
-                            'Power_Level':0
-                            })
-    fresh_df.sort_index(inplace=True)
-
-    work_sheet_update(worksheet, fresh_df)
+    new_row_values = [stk, ten, str(ngay_sinh), sdt, email, hash_password(matkhau),
+                        sodu, '0', '0', 0, 0]
+    worksheet.append_row(new_row_values)
     
 # Các thông số cho hàm chuyển khoản:
 MAX_RETRY_ATTEMPTS = 5
@@ -506,7 +511,7 @@ def update_accounts_safely(account_ids: list, mutation_function):
         )
 
         if not conflict:
-            work_sheet_update(worksheet, fresh_df)
+            update_account_rows(worksheet, fresh_df, account_ids)
             return fresh_df
 
         # Có xung đột -> chờ một chút (backoff) rồi thử lại toàn bộ từ đầu
@@ -1046,14 +1051,101 @@ def transfer_rehearsal():
 
 # Form thông tin tài khoản và chỉnh sửa:
 def account_info(stk):
-    
+    global worksheet, df
+    worksheet, df = df_init()
     text = st.session_state.text
 
-    ten = st.text_input(text['su_lbl_name'], value=st.session_state.acc_name, placeholder=text['su_placeholder_required'])
-    ngay_sinh = st.date_input(text['su_lbl_dob'], value= datetime.today(), min_value= date(1920,1,1), max_value= datetime.today(), format='DD/MM/YYYY', key= 'temp_DoB', on_change=process_temp_DoB)
-    sdt = st.text_input(text['su_lbl_phone'])
-    email = st.text_input(text['su_lbl_email'])
-    mat_khau = st.text_input(text['su_lbl_pass'], type='password', max_chars=24, placeholder=text['su_placeholder_required'])
-    xn_mat_khau = st.text_input(text['su_lbl_confirm_pass'], type='password', max_chars=24, placeholder=text['su_placeholder_required'])
-    sodu = st.number_input(text['su_lbl_balance'], value= 2000000, min_value=500000, max_value=100000000000, step=100000, placeholder=text['su_placeholder_required'], format= '%d')
-    
+    snapshot_df = get_display_snapshot()
+    if stk not in snapshot_df.index:
+        st.error(text['lg_err_not_found'])
+        return
+
+    current_info = snapshot_df.loc[stk]
+
+    if st.session_state.get('password_change_need'):
+        st.warning(text['as_warning_forced_change'])
+
+    # ============================================================
+    # PHẦN 1: THÔNG TIN CÁ NHÂN
+    # ============================================================
+    st.markdown(f"**:violet[{text['as_section_profile']}]**")
+    with st.form('form_account_info', clear_on_submit=False):
+        ten = st.text_input(text['su_lbl_name'], value=current_info['Name'], placeholder=text['su_placeholder_required'])
+        ngay_sinh = st.date_input(text['su_lbl_dob'], value=pd.to_datetime(current_info['DoB']).date(),
+                                min_value=date(1920, 1, 1), max_value=datetime.today(), format='DD/MM/YYYY')
+        sdt = st.text_input(text['su_lbl_phone'], value=current_info['Phone'])
+        email = st.text_input(text['su_lbl_email'], value=current_info['Email'])
+        current_pass_for_info = st.text_input(text['as_lbl_current_pass'], type='password', max_chars=24,
+                                                placeholder=text['su_placeholder_required'])
+
+        if st.form_submit_button(text['as_btn_save_profile']):
+            form_check = True
+            if ten == '':
+                st.error(text['su_err_name_empty']); form_check = False
+            elif ' ' not in ten:
+                st.error(text['su_err_name_fullname']); form_check = False
+            elif ten.isdigit():
+                st.error(text['su_err_name_digit']); form_check = False
+            if calculate_age(ngay_sinh) < 16:
+                st.error(text['su_err_age_limit']); form_check = False
+            if not validate_phone(sdt):
+                st.error(text['su_err_phone_format']); form_check = False
+            else:
+                other_accounts_df = get_display_snapshot().drop(index=stk, errors='ignore')
+                if sdt in list(other_accounts_df['Phone']):
+                    st.error(text['su_err_phone_exist']); form_check = False
+            if not validate_email(email):
+                st.error(text['su_err_email_format']); form_check = False
+            else:
+                other_accounts_df = get_display_snapshot().drop(index=stk, errors='ignore')
+                if email.upper() in list(other_accounts_df['Email'].str.upper()):
+                    st.error(text['su_err_email_exist']); form_check = False
+            if current_pass_for_info == '':
+                st.error(text['lg_err_pass_empty']); form_check = False
+            elif login_check(stk, current_pass_for_info) != 2:
+                st.error(text['as_err_current_pass_wrong']); form_check = False
+
+            if form_check:
+                def apply_profile_update(current_df):
+                    current_df.loc[stk, 'Name'] = ten
+                    current_df.loc[stk, 'DoB'] = ngay_sinh
+                    current_df.loc[stk, 'Phone'] = sdt
+                    current_df.loc[stk, 'Email'] = email
+                update_accounts_safely([stk], apply_profile_update)
+                st.session_state.acc_name = ten
+                st.success(text['as_success_profile_updated'])
+                st.rerun()
+
+    st.markdown('---')
+
+    # ============================================================
+    # PHẦN 2: ĐỔI MẬT KHẨU
+    # ============================================================
+    st.markdown(f"**:violet[{text['as_section_change_pass']}]**")
+    with st.form('form_change_password', clear_on_submit=True):
+        current_pass = st.text_input(text['as_lbl_current_pass'], type='password', max_chars=24,
+                                    placeholder=text['su_placeholder_required'], key='current_pass_for_change')
+        new_pass = st.text_input(text['as_lbl_new_pass'], type='password', max_chars=24,
+                                placeholder=text['su_placeholder_required'])
+        confirm_new_pass = st.text_input(text['as_lbl_confirm_new_pass'], type='password', max_chars=24,
+                                        placeholder=text['su_placeholder_required'])
+
+        if st.form_submit_button(text['as_btn_change_pass']):
+            form_check = True
+            if current_pass == '':
+                st.error(text['lg_err_pass_empty']); form_check = False
+            elif login_check(stk, current_pass) != 2:
+                st.error(text['as_err_current_pass_wrong']); form_check = False
+            if new_pass == '':
+                st.error(text['su_err_pass_empty']); form_check = False
+            elif len(new_pass) < 8:
+                st.error(text['su_err_pass_length']); form_check = False
+            elif new_pass != confirm_new_pass:
+                st.error(text['su_err_pass_mismatch']); form_check = False
+
+            if form_check:
+                def apply_password_change(current_df):
+                    current_df.loc[stk, 'Password'] = hash_password(new_pass)
+                update_accounts_safely([stk], apply_password_change)
+                st.session_state.password_change_need = False
+                st.success(text['as_success_pass_changed'])    

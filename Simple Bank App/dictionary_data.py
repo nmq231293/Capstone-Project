@@ -142,6 +142,19 @@ DICTIONARY = {
         'sys_err_update_conflict': 'Không thể cập nhật dữ liệu do hệ thống đang bận, vui lòng thử lại.',
         'rh_transfer_button': 'Quay về trang chuyển khoản',
         
+        # --- THÔNG TIN CÁ NHÂN ---
+        'as_section_profile': 'Thông tin cá nhân',
+        'as_section_change_pass': 'Đổi mật khẩu',
+        'as_btn_save_profile': 'Lưu thay đổi',
+        'as_lbl_current_pass': 'Mật khẩu hiện tại',
+        'as_lbl_new_pass': 'Mật khẩu mới',
+        'as_lbl_confirm_new_pass': 'Xác nhận mật khẩu mới',
+        'as_btn_change_pass': 'Đổi mật khẩu',
+        'as_success_profile_updated': 'Cập nhật thông tin thành công',
+        'as_success_pass_changed': 'Đổi mật khẩu thành công! Quý khách hãy ghi nhớ mật khẩu mới.',
+        'as_err_current_pass_wrong': 'Mật khẩu hiện tại không đúng',
+        'as_warning_forced_change': '⚠️ Vì lý do bảo mật (tài khoản có dấu hiệu bị đăng nhập từ nơi khác), quý khách nên đổi mật khẩu ngay bây giờ.',
+        
         # --- SYSTEM PROMPT CHATBOT VI ---
         'system_prompt': '''        
             Bạn là một trợ lý ảo thông minh được tích hợp trong ứng dụng "NGÂN HÀNG REYNOLD".
@@ -301,6 +314,19 @@ DICTIONARY = {
         'rh_err_system_busy': 'The system is processing multiple transactions, please try again shortly.',
         'sys_err_update_conflict': 'Unable to update data because the system is busy, please try again.',
         'rh_transfer_button': 'Back to transfer page',        
+        
+        # --- ACCOUNT SETTINGS ---
+        'as_section_profile': 'Personal Information',
+        'as_section_change_pass': 'Change Password',
+        'as_btn_save_profile': 'Save changes',
+        'as_lbl_current_pass': 'Current password',
+        'as_lbl_new_pass': 'New password',
+        'as_lbl_confirm_new_pass': 'Confirm new password',
+        'as_btn_change_pass': 'Change password',
+        'as_success_profile_updated': 'Profile updated successfully',
+        'as_success_pass_changed': 'Password changed successfully! Please remember your new password.',
+        'as_err_current_pass_wrong': 'Current password is incorrect',
+        'as_warning_forced_change': '⚠️ For security reasons (your account showed signs of being accessed from another device), please change your password now.',
 
         # --- SYSTEM PROMPT CHATBOT EN ---
         'system_prompt': '''
